@@ -28,7 +28,7 @@ export default function UpdatePasswordPage() {
       toast.success('Password updated successfully');
       router.push('/auth/login');
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || 'An error occurred while updating the password');
     } finally {
       setLoading(false);
     }
@@ -38,7 +38,7 @@ export default function UpdatePasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Update password</CardTitle>
+          <CardTitle>Update Password</CardTitle>
           <CardDescription>Enter your new password</CardDescription>
         </CardHeader>
         <form onSubmit={handleUpdatePassword}>
@@ -51,12 +51,14 @@ export default function UpdatePasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={8} // Optional: enforce a minimum password length
+                placeholder="Enter your new password"
               />
             </div>
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Updating password...' : 'Update password'}
+              {loading ? 'Updating password...' : 'Update Password'}
             </Button>
           </CardFooter>
         </form>

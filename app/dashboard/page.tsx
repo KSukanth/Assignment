@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 interface Profile {
   id: string;
@@ -19,21 +19,35 @@ export default function DashboardPage() {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionLoading, setSessionLoading] = useState(true); // New loading state for session checking
 
   useEffect(() => {
-    getProfile();
+    checkUser();
   }, []);
 
-  async function getProfile() {
+  async function checkUser() {
+    setSessionLoading(true); // Set session loading to true
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) throw new Error('No user found');
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session) {
+        router.push('/auth/login');
+        return;
+      }
+      getProfile(data.session.user.id);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setSessionLoading(false); // End session loading
+    }
+  }
 
+  async function getProfile(userId: string) {
+    setLoading(true); // Set profile loading to true
+    try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .single();
 
       if (error) throw error;
@@ -41,21 +55,20 @@ export default function DashboardPage() {
     } catch (error: any) {
       toast.error(error.message);
     } finally {
-      setLoading(false);
+      setLoading(false); // End profile loading
     }
   }
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await supabase.auth.signOut();
       router.push('/auth/login');
     } catch (error: any) {
       toast.error(error.message);
     }
   };
 
-  if (loading) {
+  if (sessionLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>

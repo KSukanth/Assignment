@@ -12,8 +12,18 @@ export async function GET(request: Request) {
   if (code) {
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
-    await supabase.auth.exchangeCodeForSession(code);
+
+    try {
+      // Attempt to exchange the code for a session
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) throw error; // Throw error if there is an issue
+    } catch (error: any) {
+      console.error('Error exchanging code for session:', error.message);
+      // Optionally, redirect to an error page or show a message
+      return NextResponse.redirect(new URL('/auth/error', request.url));
+    }
   }
 
+  // Redirect to the dashboard after successful session exchange
   return NextResponse.redirect(new URL('/dashboard', request.url));
 }

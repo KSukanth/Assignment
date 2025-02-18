@@ -26,7 +26,7 @@ export default function ResetPasswordPage() {
 
       toast.success('Password reset instructions sent to your email');
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message || 'An error occurred while sending reset instructions');
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Reset password</CardTitle>
+          <CardTitle>Reset Password</CardTitle>
           <CardDescription>Enter your email to reset your password</CardDescription>
         </CardHeader>
         <form onSubmit={handleResetPassword}>
@@ -55,12 +55,12 @@ export default function ResetPasswordPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Sending instructions...' : 'Send instructions'}
+              {loading ? 'Sending instructions...' : 'Send Instructions'}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
               Remember your password?{' '}
               <Link href="/auth/login" className="text-primary hover:underline">
-                Sign in
+                Sign In
               </Link>
             </p>
           </CardFooter>

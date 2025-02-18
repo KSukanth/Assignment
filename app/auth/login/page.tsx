@@ -29,8 +29,9 @@ export default function LoginPage() {
       if (error) throw error;
 
       toast.success('Logged in successfully');
-      router.push('/dashboard');
-      router.refresh();
+
+      // Redirect to dashboard on successful login
+      router.replace('/dashboard');
     } catch (error: any) {
       toast.error(error.message);
     } finally {
